@@ -1,0 +1,9 @@
+runConfig:
+  runtime: python311
+  entrypoint: uvicorn app:app --host 0.0.0.0 --port $PORT
+
+env:
+  - variable: OPENAI_API_KEY
+    secret: OPENAI_API_KEY
+  - variable: PORT
+    value: "8080"

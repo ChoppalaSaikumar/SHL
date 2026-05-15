@@ -1,0 +1,6 @@
+runConfig:
+  runtime: nodejs20
+
+env:
+  - variable: VITE_API_URL
+    value: "/_/backend"
