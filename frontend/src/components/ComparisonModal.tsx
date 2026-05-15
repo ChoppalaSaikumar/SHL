@@ -1,0 +1,117 @@
+import React from 'react';
+import { X, Check, Minus, FileText, Download } from 'lucide-react';
+import { Recommendation } from '../store/useChatStore';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  items: Recommendation[];
+}
+
+const ComparisonModal: React.FC<Props> = ({ isOpen, onClose, items }) => {
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+        />
+        
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: 30 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 30 }}
+          className="relative w-full max-w-6xl glass-panel rounded-[2.5rem] shadow-2xl overflow-hidden"
+        >
+          <div className="flex justify-between items-center p-8 border-b dark:border-white/5">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-8 h-8 rounded-lg bg-shl-500/10 text-shl-500 flex items-center justify-center">
+                  <FileText size={18} />
+                </div>
+                <h2 className="text-3xl font-display font-black tracking-tight dark:text-white">Differential Analysis</h2>
+              </div>
+              <p className="text-sm text-slate-500 font-medium">Comparing {items.length} assessments for optimal role alignment.</p>
+            </div>
+            <button 
+              onClick={onClose}
+              className="w-12 h-12 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-white/5 rounded-full transition-all"
+            >
+              <X size={24} />
+            </button>
+          </div>
+
+          <div className="p-8 overflow-x-auto custom-scrollbar max-h-[60vh]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr>
+                  <th className="py-6 px-4 font-black text-slate-400 text-[10px] uppercase tracking-[0.2em] border-b dark:border-white/5">Assessment Feature</th>
+                  {items.map((item, i) => (
+                    <th key={i} className="py-6 px-6 font-display font-black text-shl-500 text-lg border-b dark:border-white/5 min-w-[250px]">
+                      {item.name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y dark:divide-white/5">
+                {[
+                  { label: 'Test Type', key: 'test_type' },
+                  { label: 'Category', key: 'category' },
+                  { label: 'Estimated Duration', key: 'duration' },
+                  { label: 'Core Skills', key: 'skills_measured' },
+                ].map((row, ri) => (
+                  <tr key={ri} className="group hover:bg-shl-500/[0.02] transition-colors">
+                    <td className="py-6 px-4 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">{row.label}</td>
+                    {items.map((item, i) => (
+                      <td key={i} className="py-6 px-6 text-sm font-medium">
+                        {row.key === 'skills_measured' ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {item.skills_measured?.split(',').map((skill, si) => (
+                              <span key={si} className="bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg text-[10px] font-bold">{skill.trim()}</span>
+                            ))}
+                          </div>
+                        ) : (
+                          (item as any)[row.key] || 'Standard'
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+                <tr className="hover:bg-shl-500/[0.02] transition-colors">
+                  <td className="py-6 px-4 text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">Security Level</td>
+                  {items.map((_, i) => (
+                    <td key={i} className="py-6 px-6">
+                      <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs">
+                        <Check size={16} />
+                        Enterprise Validated
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-8 bg-slate-50/50 dark:bg-white/5 flex flex-col sm:flex-row justify-between items-center gap-6 border-t dark:border-white/5">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest italic">Generated by SHL AI Analysis Engine</p>
+            <div className="flex gap-4 w-full sm:w-auto">
+              <button onClick={onClose} className="flex-1 sm:flex-none btn-secondary text-xs px-8">Close Report</button>
+              <button className="flex-1 sm:flex-none btn-premium text-xs px-8">
+                <Download size={14} />
+                Export Comparison
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};
+
+export default ComparisonModal;
